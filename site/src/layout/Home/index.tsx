@@ -1,6 +1,44 @@
 import { useState, useRef, useEffect } from 'react';
 import Head from 'next/head';
 
+(function getUserMediaPolyfill() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  if (navigator.mediaDevices === undefined) {
+    (navigator as any).mediaDevices = {};
+  }
+
+  if (navigator.mediaDevices.getUserMedia === undefined) {
+    navigator.mediaDevices.getUserMedia = function (constraints) {
+      const getUserMedia =
+        // @ts-ignore
+        navigator.getUserMedia ||
+        // @ts-ignore
+        navigator.webkitGetUserMedia ||
+        // @ts-ignore
+        navigator.mozGetUserMedia ||
+        // @ts-ignore
+        navigator.msGetUserMedia;
+
+      if (!getUserMedia) {
+        return Promise.reject(
+          new Error('getUserMedia is not implemented in this browser'),
+        );
+      }
+
+      return new Promise(function (resolve, reject) {
+        getUserMedia.call(navigator, constraints, resolve, reject);
+      });
+    };
+  }
+})();
+
+function hasGetUserMedia() {
+  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+}
+
 export const Home = () => {
   const [error, setError] = useState(null);
   const [status, setStatus] = useState('loading');
@@ -62,7 +100,7 @@ export const Home = () => {
   }
 
   async function setupCamCheck() {
-    if (navigator?.mediaDevices?.getUserMedia) {
+    if (hasGetUserMedia()) {
       setStatus('retrieving');
 
       const mediaSource = new MediaSource();
@@ -91,24 +129,10 @@ export const Home = () => {
           console.log('SRCOBJECT');
           console.log(videoSrc);
 
-          if ('srcObject' in video) {
-            try {
-              // @ts-ignore
-              video.srcObject = videoSrc;
-            } catch (err) {
-              // @ts-ignore
-              if (err.name != 'TypeError') {
-                console.error(err);
-                // @ts-ignore
-                setError(err);
-              }
-              // @ts-ignore
-              video.src = URL.createObjectURL(videoSrc);
-            }
-          } else {
-            // @ts-ignore
-            video.src = URL.createObjectURL(videoSrc);
-          }
+          // @ts-ignore
+          video.srcObject = videoSrc;
+          // @ts-ignore
+          // video.src = URL.createObjectURL(videoSrc);
 
           // @ts-ignore
           video.play();
@@ -153,6 +177,13 @@ export const Home = () => {
               ) : null}
             </div>
             {error ? <p>Whoops! An error occurred!</p> : null}
+            <button
+              onClick={() => {
+                setupCamCheck();
+              }}
+            >
+              Refresh
+            </button>
           </div>
         </div>
       </section>
