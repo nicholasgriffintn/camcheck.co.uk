@@ -5,6 +5,9 @@ import Head from 'next/head';
   if (typeof window === 'undefined') {
     return;
   }
+  if (typeof navigator === 'undefined') {
+    return;
+  }
 
   if (navigator.mediaDevices === undefined) {
     (navigator as any).mediaDevices = {};
@@ -12,25 +15,29 @@ import Head from 'next/head';
 
   if (navigator.mediaDevices.getUserMedia === undefined) {
     navigator.mediaDevices.getUserMedia = function (constraints) {
-      const getUserMedia =
-        // @ts-ignore
-        navigator.getUserMedia ||
-        // @ts-ignore
-        navigator.webkitGetUserMedia ||
-        // @ts-ignore
-        navigator.mozGetUserMedia ||
-        // @ts-ignore
-        navigator.msGetUserMedia;
+      if (constraints) {
+        const getUserMedia =
+          // @ts-ignore
+          navigator.getUserMedia ||
+          // @ts-ignore
+          navigator.webkitGetUserMedia ||
+          // @ts-ignore
+          navigator.mozGetUserMedia ||
+          // @ts-ignore
+          navigator.msGetUserMedia;
 
-      if (!getUserMedia) {
-        return Promise.reject(
-          new Error('getUserMedia is not implemented in this browser'),
-        );
+        if (!getUserMedia) {
+          return Promise.reject(
+            new Error('getUserMedia is not implemented in this browser'),
+          );
+        }
+
+        return new Promise(function (resolve, reject) {
+          getUserMedia.call(navigator, constraints, resolve, reject);
+        });
+      } else {
+        return Promise.reject(new Error('no constraints were provided'));
       }
-
-      return new Promise(function (resolve, reject) {
-        getUserMedia.call(navigator, constraints, resolve, reject);
-      });
     };
   }
 })();
