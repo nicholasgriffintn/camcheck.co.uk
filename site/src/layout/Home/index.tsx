@@ -23,6 +23,9 @@ export const Home = () => {
   }
 
   async function getCameraOutput(cameras = cameraOptions) {
+    console.log("CAMERAS:")
+    console.log(cameras)
+
     const streamPromises = cameras.map(function (camera) {
       return navigator.mediaDevices.getUserMedia({
         audio: false,
@@ -33,6 +36,9 @@ export const Home = () => {
     const streams = await Promise.all(streamPromises).catch(err =>
       setError(err),
     );
+
+    console.log("STREAMS:")
+    console.log(streams)
 
     // @ts-ignore
     if (streams?.length > 0) {
@@ -74,6 +80,9 @@ export const Home = () => {
 
       if (cameras && cameras.length > 0) {
         setStatus('streaming');
+
+        console.log("SRCOBJECT")
+        console.log(await getCameraOutput(cameras))
 
         // @ts-ignore
         video.srcObject = await getCameraOutput(cameras);
