@@ -138,6 +138,9 @@ export const Home = () => {
           // @ts-ignore
           video.srcObject = videoSrc;
           // @ts-ignore
+          video.setAttribute('playsinline', true);
+          // @ts-ignore
+          video.setAttribute('controls', true);
 
           // @ts-ignore
           video.play();
