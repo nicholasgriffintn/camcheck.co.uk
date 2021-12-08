@@ -110,7 +110,6 @@ export const Home = () => {
             </h1>
             <div className="camera">
               <video autoPlay playsInline muted ref={videoRef}></video>
-              <canvas id="meter" width="500" height="50"></canvas>
             </div>
             {error ? <p>Whoops! An error occurred!</p> : null}
           </div>
