@@ -125,6 +125,11 @@ export const Home = () => {
             </h1>
             <div className="camera">
               <video autoPlay playsInline muted ref={videoRef}></video>
+              {cameraOptions.length > 0 ? (
+                <p className="text-center text-white mt-2">
+                  Using: {cameraOptions[selectedCamera].label}
+                </p>
+              ) : null}
             </div>
             {error ? <p>Whoops! An error occurred!</p> : null}
           </div>
