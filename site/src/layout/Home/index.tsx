@@ -23,9 +23,6 @@ export const Home = () => {
   }
 
   async function getCameraOutput(cameras = cameraOptions) {
-    console.log("CAMERAS:")
-    console.log(cameras)
-
     const streamPromises = cameras.map(function (camera) {
       return navigator.mediaDevices.getUserMedia({
         audio: false,
@@ -33,12 +30,13 @@ export const Home = () => {
       });
     });
 
-    const streams = await Promise.all(streamPromises).catch(err =>
-      setError(err),
-    );
+    const streams = await Promise.all(streamPromises).catch(err => {
+      console.error(err);
+      setError(err);
+    });
 
-    console.log("STREAMS:")
-    console.log(streams)
+    console.log('STREAMS:');
+    console.log(streams);
 
     // @ts-ignore
     if (streams?.length > 0) {
@@ -70,22 +68,30 @@ export const Home = () => {
       let video = videoRef.current;
 
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
+        audio: false,
         video: true,
       });
 
       const cameras = await getCameras();
+      console.log('CAMERAS:');
+      console.log(cameras);
       const microphones = await getMicrophones();
+      console.log('MICROPHONES:');
+      console.log(microphones);
       const speakers = await getSpeakers();
+      console.log('SPEAKERS:');
+      console.log(speakers);
 
       if (cameras && cameras.length > 0) {
         setStatus('streaming');
 
-        console.log("SRCOBJECT")
-        console.log(await getCameraOutput(cameras))
+        const videoSrc = await getCameraOutput(cameras);
+
+        console.log('SRCOBJECT');
+        console.log(videoSrc);
 
         // @ts-ignore
-        video.srcObject = await getCameraOutput(cameras);
+        video.srcObject = videoSrc;
         // @ts-ignore
         video.play();
       } else {
