@@ -65,35 +65,56 @@ export const Home = () => {
     if (navigator?.mediaDevices?.getUserMedia) {
       setStatus('retrieving');
 
+      const mediaSource = new MediaSource();
       let video = videoRef.current;
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: true,
-      });
+      if (video) {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: true,
+        });
 
-      const cameras = await getCameras();
-      console.log('CAMERAS:');
-      console.log(cameras);
-      const microphones = await getMicrophones();
-      console.log('MICROPHONES:');
-      console.log(microphones);
-      const speakers = await getSpeakers();
-      console.log('SPEAKERS:');
-      console.log(speakers);
+        const cameras = await getCameras();
+        console.log('CAMERAS:');
+        console.log(cameras);
+        const microphones = await getMicrophones();
+        console.log('MICROPHONES:');
+        console.log(microphones);
+        const speakers = await getSpeakers();
+        console.log('SPEAKERS:');
+        console.log(speakers);
 
-      if (cameras && cameras.length > 0) {
-        setStatus('streaming');
+        if (cameras && cameras.length > 0) {
+          setStatus('streaming');
 
-        const videoSrc = await getCameraOutput(cameras);
+          const videoSrc = await getCameraOutput(cameras);
+          console.log('SRCOBJECT');
+          console.log(videoSrc);
 
-        console.log('SRCOBJECT');
-        console.log(videoSrc);
+          if ('srcObject' in video) {
+            try {
+              // @ts-ignore
+              video.srcObject = videoSrc;
+            } catch (err) {
+              // @ts-ignore
+              if (err.name != 'TypeError') {
+                console.error(err);
+                // @ts-ignore
+                setError(err);
+              }
+              // @ts-ignore
+              video.src = URL.createObjectURL(videoSrc);
+            }
+          } else {
+            // @ts-ignore
+            video.src = URL.createObjectURL(videoSrc);
+          }
 
-        // @ts-ignore
-        video.srcObject = videoSrc;
-        // @ts-ignore
-        video.play();
+          // @ts-ignore
+          video.play();
+        } else {
+          setStatus('nocamera');
+        }
       } else {
         setStatus('nocamera');
       }
