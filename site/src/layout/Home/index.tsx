@@ -138,7 +138,6 @@ export const Home = () => {
           // @ts-ignore
           video.srcObject = videoSrc;
           // @ts-ignore
-          // video.src = URL.createObjectURL(videoSrc);
 
           // @ts-ignore
           video.play();
@@ -175,7 +174,13 @@ export const Home = () => {
                 : 'Please wait...'}
             </h1>
             <div className="camera">
-              <video autoPlay playsInline muted ref={videoRef}></video>
+              <video
+                autoPlay
+                playsInline
+                muted
+                controls={true}
+                ref={videoRef}
+              ></video>
               {cameraOptions.length > 0 ? (
                 <p className="text-center text-white mt-2">
                   Using: {cameraOptions[selectedCamera].label}
