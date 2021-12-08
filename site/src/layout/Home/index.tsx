@@ -58,26 +58,30 @@ export const Home = () => {
   }
 
   async function setupCamCheck() {
-    setStatus('retrieving');
+    if (navigator?.mediaDevices?.getUserMedia) {
+      setStatus('retrieving');
 
-    let video = videoRef.current;
+      let video = videoRef.current;
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: true,
-    });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+      });
 
-    const cameras = await getCameras();
-    const microphones = await getMicrophones();
-    const speakers = await getSpeakers();
+      const cameras = await getCameras();
+      const microphones = await getMicrophones();
+      const speakers = await getSpeakers();
 
-    if (cameras && cameras.length > 0) {
-      setStatus('streaming');
+      if (cameras && cameras.length > 0) {
+        setStatus('streaming');
 
-      // @ts-ignore
-      video.srcObject = await getCameraOutput(cameras);
-      // @ts-ignore
-      video.play();
+        // @ts-ignore
+        video.srcObject = await getCameraOutput(cameras);
+        // @ts-ignore
+        video.play();
+      } else {
+        setStatus('nocamera');
+      }
     } else {
       setStatus('nocamera');
     }
