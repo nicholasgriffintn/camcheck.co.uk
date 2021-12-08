@@ -110,7 +110,6 @@ export const Home = () => {
     if (hasGetUserMedia()) {
       setStatus('retrieving');
 
-      const mediaSource = new MediaSource();
       let video = videoRef.current;
 
       if (video) {
