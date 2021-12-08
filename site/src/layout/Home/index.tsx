@@ -25,7 +25,7 @@ export const Home = () => {
   async function getCameraOutput(cameras = cameraOptions) {
     const streamPromises = cameras.map(function (camera) {
       return navigator.mediaDevices.getUserMedia({
-        audio: true,
+        audio: false,
         video: { deviceId: { exact: camera.deviceId } },
       });
     });
